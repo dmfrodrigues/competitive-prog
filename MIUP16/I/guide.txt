@@ -1,0 +1,5 @@
+To know how many segments does a segment intersect takes O(n).
+
+If we know how many segments a segment crosses, we know if one of the vertices lies outside the polygon.
+
+Monte Carlo: 50²*N=1e8 <=> N = 

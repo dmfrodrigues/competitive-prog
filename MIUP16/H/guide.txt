@@ -1,0 +1,61 @@
+2 [9,11]
+2 [5,13]
+3 [2,7]
+1 [11,16]
+1 [4,9]
+3 [1,6]
+
+3 [1,6]
+3 [2,7]
+1 [4,9]
+2 [5,13]
+2 [9,11]
+1 [11,16]
+
++ 6
+
+2 [1,6]
+2 [2,7]
+1 [5,13]
+2 [9,11]
+1 [11,16]
+-{6}
+
++5
+
+1 [1,6]
+1 [2,7]
+2 [9,11]
+1 [11,16]
+-{5,6}
+
++4
+
+2 [9,11]
+1 [11,16]
+-{4,5,6}
+
++11
+
+1 [9,11]
+-{4,5,6,11}
+
++10
+
+-{4,5,6,10,11}
+
+
+Qual é o primeiro fim? Seja o primeiro fim em `e`, e que esse segmento necessite de `n` emails
+ok, então agora encontra todos os segmentos que começam numa posição menor ou igual a `e` (como `e` é o primeiro fim, tudo o que tem para trás só pode ser começos, não fins)
+então, agora vamos mandar `n` emails nas maiores horas possíveis que sejam menores ou iguais a `e` e que se encontrem disponíveis; agora, vamos pegar nesses segmentos que começam antes de `e`, e vamos descontar `n` a cada um.
+
+
+
+
+
+
+
+
+
+
+
