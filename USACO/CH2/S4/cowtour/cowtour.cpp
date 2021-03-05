@@ -21,7 +21,7 @@ typedef pair<PII,PII>           PPP;
 
 typedef int node_t;
 
-typedef float dist_t;
+typedef double dist_t;
 const dist_t INF = 1000000000;
 
 struct pos_t {
@@ -73,6 +73,18 @@ dist_t getMaxDist(node_t i, const vector<pos_t> &pos, const vector<list<node_t>>
     return ret;
 }
 
+unordered_map<node_t, dist_t> getFieldsDiameter(const vector<node_t> &fields, const vector<dist_t> &maxDist){
+    const size_t &N = fields.size();
+
+    unordered_map<node_t, dist_t> ret;
+    FOR(i,0,N){
+        if(!ret.count(fields[i])) ret[fields[i]] = 0.0;
+        ret[fields[i]] = max(ret[fields[i]], maxDist[i]);
+    }
+
+    return ret;
+}
+
 int main(){
     // INPUT FILES
     ifstream fin("cowtour.in");
@@ -92,13 +104,20 @@ int main(){
     vector<node_t> fields = getFields(pos, adj);
     vector<dist_t> maxDist(N);
     FOR(i,0,N) maxDist[i] = getMaxDist(i, pos, adj);
+    unordered_map<node_t, dist_t> fieldDiameter = getFieldsDiameter(fields, maxDist);
     
     dist_t sol = INF;
     FOR(i,0,N) FOR(j,i+1,N){
         if(fields[i] == fields[j]) continue;
         sol = min(
             sol,
-            maxDist[i] + (pos[j]-pos[i]).dist() + maxDist[j]
+            max(
+                max(
+                    fieldDiameter[fields[i]],
+                    fieldDiameter[fields[j]]
+                ),
+                maxDist[i] + (pos[j]-pos[i]).dist() + maxDist[j]
+            )
         );
     }
 
