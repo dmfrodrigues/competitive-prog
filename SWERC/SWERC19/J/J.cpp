@@ -38,25 +38,25 @@ lli catalan(lli n, lli MOD){
     return (ret%MOD + MOD)%MOD;
 }
 
-lli solve(const VI::const_iterator &begin, const VI::const_iterator &end){
+lli solve(const VI &v, lli begin, lli end){
     if(begin == end) return 1;
 
-    lli m = *min_element(begin, end);
-    lli n = count(begin, end, m);
+    lli m = *min_element(v.begin()+begin, v.begin()+end);
+    lli n = count(v.begin()+begin, v.begin()+end, m);
     lli ret = catalan(n, MOD);
 
-    VI::const_iterator left = begin;
-    VI::const_iterator right;
+    lli left = begin;
+    lli right;
 
-    for(auto it = begin; it != end; ++it){
-        if(*it == m){
-            right = it;
-            ret = (ret*solve(left, right))%MOD;
-            left = it; ++left;
+    for(lli i = begin; i != end; ++i){
+        if(v[i] == m){
+            right = i;
+            ret = (ret*solve(v, left, right))%MOD;
+            left = i; ++left;
         }
     }
     right = end;
-    ret = (ret*solve(left, right))%MOD;
+    ret = (ret*solve(v, left, right))%MOD;
     
     return ret;
 }
@@ -68,7 +68,7 @@ int main(){
     FOR(i,0,N) cin >> v[i];
 
     // PROCESS
-    lli ret = solve(v.begin(), v.end());
+    lli ret = solve(v, 0, v.size());
 
     // OUTPUT
     cout << ret << endl;
