@@ -15,64 +15,52 @@ typedef pair<PII,PII>           PPP;
 #define Y second
 const lli INF = 1000000000;
 
-struct edge {
-	lli to, c, b;
-	bool operator<(const edge& e)const{
-		if(c  != e.c ) return (c  < e.c );
-        if(b  != e.b ) return (b  < e.b );
-		return (to < e.to);
-	}
-};
-
-class alGraph:public vector< deque<edge> >{ // Adjency List
-public:
-	alGraph(lli s):vector< deque<edge> >(s){}
-	void addEdge(lli src, lli dst, lli c, lli b) {
-		(*this)[src].push_back({dst, c, b});
-	}
-};
-
-struct POS{
-    lli to, c, b;
-    bool operator<(const POS &p) const{
-        if(c  != p.c ) return (c  < p.c );
-        if(b  != p.b ) return (b  < p.b );
-        return (to < p.to);
-    }
-    bool operator>(const POS &p) const{ return (p < *this); }
-};
+typedef vector< unordered_map<lli, lli> > Graph;
 
 lli B;
 
-lli dijkstra(const alGraph &g, lli src, lli trg) {
-    priority_queue<POS, vector<POS>, greater<POS> > a; //cost so far, node
-    a.push({src, 0, 0});
-    while(!a.empty()){
-        POS pos = a.top(); a.pop();
-        if(pos.b > B) continue;
-        if(pos.to == trg) return pos.c;
-        for(const auto& e : g[pos.to]){
-            a.push({e.to, pos.c+e.c, pos.b+e.b});
-        }
-    }
-    return INF;
-}
-
-lli dist(const PII &a, const PII &b){
+lli distance(const PII &a, const PII &b){
     lli dx = a.X - b.X, dy = a.Y - b.Y;
     return ceil(sqrt(dx*dx+dy*dy));
 }
 
+lli dijkstra(const vector<PII> &pos, const Graph &g, lli src, lli dst){
+    const size_t &N = pos.size();
+    VI dist(N, INF); VI co2(N, INF);
+    vector<bool> visited(N, false);
+    priority_queue<PII, vector<PII>, greater<PII> > q; //cost so far, node
+    dist[src] = 0; co2[src] = 0; q.push({co2[src], src});
+    while(!q.empty()){
+        lli u = q.top().second; q.pop();
+        cout << u << ": " << dist[u] << " " << co2[u] << endl;
+        if(u == dst) return co2[u];
+        if(visited[u]){ continue; } visited[u] = true;
+        for(const auto& e : g[u]){
+            const lli &v = e.first;
+            lli cost_co2  = co2 [u] + e.second;
+            lli cost_dist = dist[u] + distance(pos[u], pos[v]);
+            if (cost_dist <= B && cost_co2 < co2[v]) {
+                dist[v] = cost_dist;
+                co2 [v] = cost_co2;
+                q.push({dist[v], v});
+            }
+        }
+    }
+
+    throw invalid_argument("");
+}
+
 int main(){
-    lli xs, ys; cin >> xs >> ys;
-    lli xd, yd; cin >> xd >> yd;
+    // INPUT
+    PII src; cin >> src.X >> src.Y;
+    PII dst; cin >> dst.X >> dst.Y;
     cin >> B;
     lli C0; cin >> C0;
     lli T; cin >> T;
     VI C(T+1); C[0] = C0;
     FOR(i,1,T+1) cin >> C[i];
     lli N; cin >> N;
-    vector<PII> pos(N+2);
+    vector<PII> pos(N+2); pos[N] = src; pos[N+1] = dst;
     vector< vector<PII> > links(N);
     FOR(i,0,N){
         cin >> pos[i].X >> pos[i].Y;
@@ -83,22 +71,32 @@ int main(){
         }
     }
 
-    alGraph g(N+2);
-
-    lli d;
+    Graph g(N+2);
+    // Add paths to src and dst
     FOR(i,0,N){
-        d = dist(pos[i], PII(xs, ys));
-        g.addEdge(N  , i  , C[0]*d, d);
-        g.addEdge(i  , N  , C[0]*d, d);
-        d = dist(pos[i], PII(xd, yd));
-        g.addEdge(N+1, i  , C[0]*d, d);
-        g.addEdge(i  , N+1, C[0]*d, d);
-        for(const PII &p:links[i]){
-            d = dist(pos[i], pos[p.first]); g.addEdge(i, p.first, C[p.second]*d, d); g.addEdge(p.first, i, C[p.second]*d, d);
+        lli d = distance(src, pos[i]);
+        g[N][i] = d*C0;
+        g[i][N] = d*C0;
+    }
+
+    // Add other paths
+    FOR(u,0,N){
+        const vector<PII> &node_links = links[u];
+        for(const PII &p: node_links){
+            lli v = p.first;
+            lli Ci = C[p.second];
+            lli d = distance(pos[u], pos[v]);
+            lli c = (g.at(u).count(v) ? g.at(u).at(v) : INF);
+            c = min(c, d*Ci);
+            g[u][v] = c;
+            g[v][u] = c;
         }
     }
 
-    lli ret = dijkstra(g, N, N+1);
+    // g now has CO2 costs
+    lli ret = dijkstra(pos, g, N, N+1);
+
+    // OUTPUT
     cout << ret << endl;
 
     return 0;
