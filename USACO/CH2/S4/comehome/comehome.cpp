@@ -37,7 +37,25 @@ edge_t dijkstra(const unordered_map<node_t, list<edge_t> > &adj){
         visited[p.first] = false;
     }
 
-    queue<node_t> q;
+    priority_queue<
+        pair<dist_t, node_t>,
+        vector<pair<dist_t, node_t>>,
+        greater<pair<dist_t, node_t>>
+    > q;
+    dist.at('Z') = 0; q.push({0, 'Z'});
+    while(!q.empty()){
+        node_t u = q.top().second; q.pop();
+        if(isupper(u) && u != 'Z') return edge_t({u, dist[u]});
+        if(visited[u]){ continue; } visited[u] = true;
+        for(const edge_t& e : adj.at(u)){
+            if (dist[e.to] > dist[u] + e.c) {
+                dist[e.to] = dist[u] + e.c;
+                q.push({dist[e.to], e.to});
+            }
+        }
+    }
+
+    throw invalid_argument("");
 }
 
 int main(){
