@@ -38,25 +38,26 @@ lli catalan(lli n, lli MOD){
     return (ret%MOD + MOD)%MOD;
 }
 
-lli solve(const VI &v, lli begin, lli end){
-    if(begin == end) return 1;
-
-    lli m = *min_element(v.begin()+begin, v.begin()+end);
-    lli n = count(v.begin()+begin, v.begin()+end, m);
-    lli ret = catalan(n, MOD);
-
-    lli left = begin;
-    lli right;
-
-    for(lli i = begin; i != end; ++i){
-        if(v[i] == m){
-            right = i;
-            ret = (ret*solve(v, left, right))%MOD;
-            left = i; ++left;
+lli solve(const VI &v){
+    lli ret = 1;
+    stack<lli> s;
+    vector<lli> counter(1000001, 0);
+    FOR(i,0,v.size()){
+        lli m = v[i];
+        while(!s.empty() && s.top() > m){
+            lli n = s.top();
+            ret = (ret*catalan(counter[n], MOD))%MOD;
+            while(!s.empty() && s.top() == n){ s.pop(); --counter[n]; }
         }
+        s.push(m); ++counter[m];
     }
-    right = end;
-    ret = (ret*solve(v, left, right))%MOD;
+
+    lli m = -1;
+    while(!s.empty() && s.top() > m){
+        lli n = s.top();
+        ret = (ret*catalan(counter[n], MOD))%MOD;
+        while(!s.empty() && s.top() == n){ s.pop(); --counter[n]; }
+    }
     
     return ret;
 }
@@ -68,7 +69,7 @@ int main(){
     FOR(i,0,N) cin >> v[i];
 
     // PROCESS
-    lli ret = solve(v, 0, v.size());
+    lli ret = solve(v);
 
     // OUTPUT
     cout << ret << endl;
