@@ -49,18 +49,18 @@ int main(){
     lli total = 0;
     lli i = 0;
 
-    cout << "L52" << endl;
+    // cout << "L52" << endl;
 
     for(i = 0; i < NUM_SIM; ++i){ //cout << "i=" << i << endl;
         total += simulate();
         NUM_SIM = (5000000*(i+1))/(D*total);
     }
 
-    cout << "L59" << endl;
+    // cout << "L59" << endl;
 
 
-    cout << setprecision(5) << fixed;
+    cout << fixed << setprecision(5);
     cout << double(total)/double(i) << endl;
-    cout << "NUM_SIM=" << NUM_SIM << endl;
+    // cout << "NUM_SIM=" << NUM_SIM << endl;
     return 0;
 }
