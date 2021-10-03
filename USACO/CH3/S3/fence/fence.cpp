@@ -20,7 +20,7 @@ typedef pair<PII,PII>           PPP;
 #define Y second
 const lli INF = 1000000000;
 
-VI euler_circuit(vector<multiset<lli>> adj, lli source){
+VI eulerian_path(vector<multiset<lli>> adj, lli source){
     stack<lli> call_stack;
     VI circuit;
     call_stack.push(source);
@@ -61,7 +61,7 @@ int main(){
         break;
     }
 
-    VI ret = euler_circuit(adj, source);
+    VI ret = eulerian_path(adj, source);
     
     ///OUTPUT
     for(const int &u: ret) fout << u+1 << endl;
