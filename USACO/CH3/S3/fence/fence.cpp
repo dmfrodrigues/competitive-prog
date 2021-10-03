@@ -40,33 +40,6 @@ VI euler_circuit(vector<multiset<lli>> adj, lli source){
     return circuit;
 }
 
-/*
-class euler_circuit{
-    vector<multiset<lli>> adj;
-    stack<lli> call_stack;
-    VI circuit;
-public:
-    euler_circuit(vector<multiset<lli>> adj_):adj(adj_){}
-    VI compute(lli u){
-        call_stack.push(u);
-        while(!call_stack.empty()){
-            u = call_stack.top();
-            if(!adj[u].empty()){
-                lli v = *adj[u].begin();
-                adj[u].erase(adj[u].find(v));
-                adj[v].erase(adj[v].find(u));
-                call_stack.push(v);
-            } else {
-                circuit.push_back(u);
-                call_stack.pop();
-            }
-        }
-        reverse(ALL(circuit));
-        return circuit;
-    }
-};
-*/
-
 int main(){
     ifstream fin("fence.in");
     ofstream fout("fence.out");
