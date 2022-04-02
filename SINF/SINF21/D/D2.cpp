@@ -48,7 +48,7 @@ int main(){
     string S; cin >> S;
     // cout << S.size() << endl;
 
-    vector<int> DP(S.size(), 0);
+    vector<lli> DP(S.size(), 0);
     DP[0] = (STRSET.count(S.substr(0, 1)) ? 1 : 0);
     lli i = 1;
     if(i < (lli)S.size()){
