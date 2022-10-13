@@ -27,13 +27,15 @@ struct Point {
 
 struct compX {
     bool operator()(const Point &a, const Point &b) const {
-        return a.x < b.x;
+        if (a.x != b.x) return a.x < b.x;
+        else return a.y < b.y;
     }
 };
 
 struct compY {
     bool operator()(const Point &a, const Point &b) const {
-        return a.y < b.y;
+        if (a.y != b.y) return a.y < b.y;
+        else return a.x < b.x;
     }
 };
 
