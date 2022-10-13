@@ -23,26 +23,21 @@ struct Point {
     bool operator==(const Point &p) const {
         return x == p.x && y == p.y;
     }
-
-    bool operator<(const Point &p){
-        if(x != p.x) return x < p.x;
-        else return y < p.y;
-    }
 };
 
 struct compX {
-    bool operator()(const Point &a, const Point &b){
+    bool operator()(const Point &a, const Point &b) const {
         return a.x < b.x;
     }
 };
 
 struct compY {
-    bool operator()(const Point &a, const Point &b){
+    bool operator()(const Point &a, const Point &b) const {
         return a.y < b.y;
     }
 };
 
-bool distance2(const Point &a, const Point &b){
+int distance2(const Point &a, const Point &b){
     int dx = a.x - b.x;
     int dy = a.y - b.y;
     return dx*dx + dy*dy;
@@ -70,7 +65,7 @@ public:
         int xmin = p.x - dist;
         int xmax = p.x + dist;
         int imin = max(xmin / delta, 0);
-        int imax = min(xmax / delta, (int)stripes.size());
+        int imax = min(xmax / delta, (int)stripes.size()-1);
         FOR(i,imin,imax+1){
             auto it1 = stripes.at(i).lower_bound(Point{p.x, p.y - dist});
             auto it2 = stripes.at(i).upper_bound(Point{p.x, p.y + dist});
@@ -103,7 +98,7 @@ void solve(const list<Point> &points, Neighbors nn, int R, int H){
     while(!q.empty()){
         Point u = q.front(); q.pop();
         int uDist = dist.at(u);
-        if(u.y+R >= H) { cout << uDist+1 << endl; return; }
+        if(u.y+R >= H) { cout << uDist << endl; return; }
         // cout << "L107" << endl;
         const list<Point> &adj = nn.nearest(u, R);
         // cout << "L109" << endl;

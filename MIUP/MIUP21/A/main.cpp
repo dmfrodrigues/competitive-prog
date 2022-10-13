@@ -17,67 +17,81 @@ const lli INF = 1000000000;
 
 struct Position {
     int h, w;
+    bool operator<(const Position &p) const {
+        if(h != p.h) return h < p.h;
+        else return w < p.w;
+    }
+    bool operator==(const Position &p) const {
+        return h == p.h && w == p.w;
+    }
 };
+
 struct Army {
-    Position initialPosition;
     int size;
+    Position pos;
+    Position initialPos;
+    bool operator<(const Army &a) const {
+        if(size != a.size) return size > a.size;
+        else return pos < a.pos;
+    }
 };
 
 int main(){
     int W, H; cin >> W >> H;
-    vector<vector<Army>> armies(H, vector<Army>(W));
+    map<Position, Army> island;
+    set<Army> armies;
     FOR(h,0,H){
         FOR(w,0,W){
             int s; cin >> s;
-            armies[h][w] = Army{Position{(int)h, (int)w}, s};
+            Position p{(int)h, (int)w};
+            Army a{s, p, p};
+            island[p] = a;
+            armies.insert(a);
         }
     }
 
-    while(true){
+
+    while(armies.size() > 1){
         // Get largest army
-        Army largestArmy{Position{0,0}, 0};
-        Position largestArmyPos;
-        int numberArmies = 0;
-        FOR(h,0,H){
-            FOR(w,0,W){
-                if(armies[h][w].size > 0)
-                    ++numberArmies;
-
-                if(armies[h][w].size > largestArmy.size){
-                    largestArmy = armies[h][w];
-                    largestArmyPos = Position{(int)h, (int)w};
-                }
-            }
-        }
-        if(largestArmy.size == 0){
-            cout << "none wins" << endl;
-            return 0;
-        }
-        if(numberArmies == 1){
-            cout
-                << largestArmy.initialPosition.h << " "
-                << largestArmy.initialPosition.w << " "
-                << largestArmy.size
-                << endl;
-            return 0;
-        }
-
+        Army largestArmy = *armies.begin();
+        
         // Get weakest neighbor
-        Army weakestNeighbor{Position{0,0}, INF};
-        Position weakestNeighborPos;
-        if(largestArmyPos.h-1 >= 0 && armies[largestArmyPos.h-1][largestArmyPos.w  ].size > 0 && armies[largestArmyPos.h-1][largestArmyPos.w  ].size < weakestNeighbor.size){ weakestNeighbor = armies[largestArmyPos.h-1][largestArmyPos.w  ]; weakestNeighborPos = Position{largestArmyPos.h-1, largestArmyPos.w  }; }
-        if(largestArmyPos.w-1 >= 0 && armies[largestArmyPos.h  ][largestArmyPos.w-1].size > 0 && armies[largestArmyPos.h  ][largestArmyPos.w-1].size < weakestNeighbor.size){ weakestNeighbor = armies[largestArmyPos.h  ][largestArmyPos.w-1]; weakestNeighborPos = Position{largestArmyPos.h  , largestArmyPos.w-1}; }
-        if(largestArmyPos.w+1 <  W && armies[largestArmyPos.h  ][largestArmyPos.w+1].size > 0 && armies[largestArmyPos.h  ][largestArmyPos.w+1].size < weakestNeighbor.size){ weakestNeighbor = armies[largestArmyPos.h  ][largestArmyPos.w+1]; weakestNeighborPos = Position{largestArmyPos.h  , largestArmyPos.w+1}; }
-        if(largestArmyPos.h+1 <  H && armies[largestArmyPos.h+1][largestArmyPos.w  ].size > 0 && armies[largestArmyPos.h+1][largestArmyPos.w  ].size < weakestNeighbor.size){ weakestNeighbor = armies[largestArmyPos.h+1][largestArmyPos.w  ]; weakestNeighborPos = Position{largestArmyPos.h+1, largestArmyPos.w  }; }
+        Army weakestNeighbor{INF, Position{0,0}, Position{0,0}};
+        Position p_;
+        p_ = Position{largestArmy.pos.h-1, largestArmy.pos.w  }; if(p_.h >= 0 && island[p_].size > 0 && island[p_].size < weakestNeighbor.size){ weakestNeighbor = island[p_]; }
+        p_ = Position{largestArmy.pos.h  , largestArmy.pos.w-1}; if(p_.w >= 0 && island[p_].size > 0 && island[p_].size < weakestNeighbor.size){ weakestNeighbor = island[p_]; }
+        p_ = Position{largestArmy.pos.h  , largestArmy.pos.w+1}; if(p_.w <  W && island[p_].size > 0 && island[p_].size < weakestNeighbor.size){ weakestNeighbor = island[p_]; }
+        p_ = Position{largestArmy.pos.h+1, largestArmy.pos.w  }; if(p_.h <  H && island[p_].size > 0 && island[p_].size < weakestNeighbor.size){ weakestNeighbor = island[p_]; }
 
         if(weakestNeighbor.size == INF){
             // Deserts due to boredom
-            armies[largestArmyPos.h][largestArmyPos.w].size = 0;
+            armies.erase(largestArmy);
+            largestArmy.size--;
+            if(largestArmy.size > 0) armies.insert(largestArmy);
+            island[largestArmy.pos] = largestArmy;
         } else {
             // Attack!
+            armies.erase(largestArmy);
+            armies.erase(weakestNeighbor);
+
+            island[largestArmy.pos] = Army{
+                0,
+                largestArmy.pos,
+                largestArmy.pos
+            };
+
             largestArmy.size -= weakestNeighbor.size;
-            armies[weakestNeighborPos.h][weakestNeighborPos.w] = largestArmy;
-            armies[largestArmyPos.h][largestArmyPos.w] = Army{Position{0,0},0};
+            largestArmy.pos = weakestNeighbor.pos;
+            island[largestArmy.pos] = largestArmy;
+
+            if(largestArmy.size > 0) armies.insert(largestArmy);
         }
     }
+    if(armies.empty()) {
+        cout << "none wins" << endl;
+    } else {
+        Army largestArmy = *armies.begin();
+        cout << largestArmy.initialPos.h << " " << largestArmy.initialPos.w << " " << largestArmy.size << endl;
+    }
+    return 0;
 }
