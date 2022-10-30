@@ -35,7 +35,7 @@ VVI bfs(const VVB &map, const Point &p, const string &instructions){
     while(!q.empty()){
         const Point &u = q.front(); q.pop();
         int uDist = dist[u.h][u.w];
-        if(uDist >= (lli)instructions.size()) return dist;
+        if(uDist >= (lli)instructions.size()) continue;
         char instruction = instructions[uDist];
         Point v;
         int vDist = uDist+1;
@@ -51,13 +51,13 @@ VVI bfs(const VVB &map, const Point &p, const string &instructions){
 
 int main(){
     int W, H; cin >> W >> H;
-    VVB map(H, VB(W, false));
+    VVB map(H, VB(W, true));
     Point start;
     FOR(h,0,H){
         string line; cin >> line;
         FOR(w,0,W){
             if(line[w] == 'S') start = Point{h, w};
-            map[h][w] = (line[w] == '#' ? false : true);
+            if(line[w] == '#') map[h][w] = false;
         }
     }
 
